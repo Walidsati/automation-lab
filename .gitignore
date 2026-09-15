@@ -8,3 +8,6 @@ venv/
 .idea/
 *.log
 secrets/
+
+# Exception: automation output we DO want to track
+!week1/hello_time.log
