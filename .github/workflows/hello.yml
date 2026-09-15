@@ -1,0 +1,26 @@
+name: Hello from the cloud
+
+on:
+  schedule:
+    # Runs every day at 06:00 UTC (≈ 9 AM Beirut)
+    - cron: "0 6 * * *"
+  workflow_dispatch:   # allows manual trigger from GitHub UI
+  push:                # also runs on every push to main (for testing)
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run hello_time
+        run: python3 week1/hello_time.py
+
+      - name: Show log file
+        run: cat week1/hello_time.log || echo "no log yet"
