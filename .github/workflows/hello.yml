@@ -6,6 +6,9 @@ on:
   workflow_dispatch:
   push:
 
+permissions:
+  contents: write
+
 jobs:
   hello:
     runs-on: ubuntu-latest
@@ -18,20 +21,21 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Show secret is available
-        env:
-          DEMO_SECRET: ${{ secrets.DEMO_SECRET }}
-        run: |
-          if [ -z "$DEMO_SECRET" ]; then
-            echo "Secret is EMPTY"
-            exit 1
-          else
-            echo "Secret is available (length: ${#DEMO_SECRET})"
-          fi
-
       - name: Run hello_time
         run: python3 week1/hello_time.py
 
       - name: Show log file
         if: always()
         run: cat week1/hello_time.log || echo "no log file was created"
+
+      - name: Commit updated log back to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add week1/hello_time.log
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: update hello_time.log [skip ci]"
+            git push
+          fi
