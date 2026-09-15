@@ -18,6 +18,17 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Show secret is available
+        env:
+          DEMO_SECRET: ${{ secrets.DEMO_SECRET }}
+        run: |
+          if [ -z "$DEMO_SECRET" ]; then
+            echo "Secret is EMPTY"
+            exit 1
+          else
+            echo "Secret is available (length: ${#DEMO_SECRET})"
+          fi
+
       - name: Run hello_time
         run: python3 week1/hello_time.py
 
