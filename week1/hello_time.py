@@ -1,18 +1,26 @@
 #!/usr/bin/env python3
-"""Logs the current date and time to a file next to this script."""
+"""Logs the current date and time. Chooses the log file based on environment."""
 
 import logging
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
 
-# The folder this script lives in — works on Mac, Linux, anywhere.
+# Where this script lives
 SCRIPT_DIR = Path(__file__).resolve().parent
-LOG_FILE = SCRIPT_DIR / "hello_time.log"
+
+# Pick file based on where we're running
+if os.environ.get("GITHUB_ACTIONS") == "true":
+    LOG_FILE = SCRIPT_DIR / "hello_time_cloud.log"
+    RUNNER = "github-actions"
+else:
+    LOG_FILE = SCRIPT_DIR / "hello_time_local.log"
+    RUNNER = "mac-launchd"
 
 
 def setup_logging() -> logging.Logger:
-    """Configure logging to file only (no terminal output needed in automation)."""
+    """Configure logging to file + terminal."""
 
     logger = logging.getLogger("hello_time")
     logger.setLevel(logging.INFO)
@@ -29,7 +37,6 @@ def setup_logging() -> logging.Logger:
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 
-    # Also print to stdout so GitHub Actions logs show it
     stream_handler = logging.StreamHandler(sys.stdout)
     stream_handler.setFormatter(formatter)
     logger.addHandler(stream_handler)
@@ -40,7 +47,7 @@ def setup_logging() -> logging.Logger:
 def main() -> int:
     logger = setup_logging()
 
-    logger.info("hello_time started")
+    logger.info(f"hello_time started (runner={RUNNER})")
     try:
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         logger.info(f"current time: {now}")

@@ -9,5 +9,7 @@ venv/
 *.log
 secrets/
 
-# Exception: automation output we DO want to track
-!week1/hello_time.log
+
+# Track these specific automation output files
+!week1/hello_time_local.log
+!week1/hello_time_cloud.log
