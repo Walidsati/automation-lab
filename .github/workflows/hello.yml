@@ -26,16 +26,16 @@ jobs:
 
       - name: Show log file
         if: always()
-        run: cat week1/hello_time.log || echo "no log file was created"
+        run: cat week1/hello_time_cloud.log || echo "no cloud log yet"
 
       - name: Commit updated log back to repo
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add week1/hello_time.log
+          git add week1/hello_time_cloud.log
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "chore: update hello_time.log [skip ci]"
+            git commit -m "chore: update hello_time_cloud.log [skip ci]"
             git push
           fi
