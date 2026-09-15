@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Logs the current date and time. Chooses the log file based on environment."""
 
+import time
 import logging
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 # Where this script lives
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -30,8 +32,9 @@ def setup_logging() -> logging.Logger:
 
     formatter = logging.Formatter(
         fmt="%(asctime)s [%(levelname)s] %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
+        datefmt="%Y-%m-%d %H:%M:%S UTC",
     )
+    formatter.converter = time.gmtime
 
     file_handler = logging.FileHandler(LOG_FILE)
     file_handler.setFormatter(formatter)
@@ -49,14 +52,16 @@ def main() -> int:
 
     logger.info(f"hello_time started (runner={RUNNER})")
     try:
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        logger.info(f"current time: {now}")
+        utc_now = datetime.now(timezone.utc)
+        beirut = utc_now.astimezone(ZoneInfo("Asia/Beirut"))
+
+        logger.info(f"UTC now:    {utc_now.strftime('%Y-%m-%d %H:%M:%S')} UTC")
+        logger.info(f"Beirut now: {beirut.strftime('%Y-%m-%d %H:%M:%S %Z')}")
         logger.info("hello_time finished successfully")
         return 0
     except Exception:
         logger.exception("hello_time failed")
         return 1
-
 
 if __name__ == "__main__":
     sys.exit(main())
