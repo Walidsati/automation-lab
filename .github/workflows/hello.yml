@@ -2,10 +2,9 @@ name: Hello from the cloud
 
 on:
   schedule:
-    # Runs every day at 06:00 UTC (≈ 9 AM Beirut)
     - cron: "0 6 * * *"
-  workflow_dispatch:   # allows manual trigger from GitHub UI
-  push:                # also runs on every push to main (for testing)
+  workflow_dispatch:
+  push:
 
 jobs:
   hello:
@@ -23,4 +22,5 @@ jobs:
         run: python3 week1/hello_time.py
 
       - name: Show log file
-        run: cat week1/hello_time.log || echo "no log yet"
+        if: always()
+        run: cat week1/hello_time.log || echo "no log file was created"
