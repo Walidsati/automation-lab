@@ -13,3 +13,5 @@ secrets/
 # Track these specific automation output files
 !week1/hello_time_local.log
 !week1/hello_time_cloud.log
+# Automation output we track from week 2
+!week2/data/run_report.log
