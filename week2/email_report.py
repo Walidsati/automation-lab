@@ -1,42 +1,40 @@
 #!/usr/bin/env python3
-"""Email the sales report PDF with an inline HTML summary."""
+"""Email the sales report PDF with an inline HTML summary (Jinja2)."""
 
 import os
 import smtplib
 import ssl
-from datetime import datetime
+from datetime import datetime, timezone
 from email.message import EmailMessage
 from pathlib import Path
 
 import pandas as pd
 from dotenv import load_dotenv
+from jinja2 import Environment, FileSystemLoader
 
-# ---- Paths ----
 SCRIPT_DIR = Path(__file__).resolve().parent
 ROOT = SCRIPT_DIR.parent
 DATA_DIR = SCRIPT_DIR / "data"
 INPUT = DATA_DIR / "sales.csv"
 PDF_PATH = DATA_DIR / "sales_report.pdf"
+TEMPLATES_DIR = SCRIPT_DIR / "templates"
 
-# ---- Load secrets from .env ----
 load_dotenv(ROOT / ".env")
 
-GMAIL_USER = os.environ["GMAIL_USER"]
-GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
-EMAIL_TO = os.environ["EMAIL_TO"]
 
-
-def build_summary_html(df):
-    """Return an HTML string summarizing the sales data."""
-    df["revenue"] = (df["units"] * df["unit_price"]).round(2)
-
-    total_revenue = df["revenue"].sum()
-    total_units = df["units"].sum()
-    best_region_row = (
-        df.groupby("region")["revenue"].sum().sort_values(ascending=False).index[0]
+def _get_secrets():
+    return (
+        os.environ["GMAIL_USER"],
+        os.environ["GMAIL_APP_PASSWORD"],
+        os.environ["EMAIL_TO"],
     )
 
-    # By region table rows
+
+def build_summary_html(df) -> str:
+    df["revenue"] = (df["units"] * df["unit_price"]).round(2)
+    total_revenue = float(df["revenue"].sum())
+    total_units = int(df["units"].sum())
+
     by_region = (
         df.groupby("region")
         .agg(units=("units", "sum"), revenue=("revenue", "sum"))
@@ -44,111 +42,77 @@ def build_summary_html(df):
         .sort_values("revenue", ascending=False)
         .reset_index()
     )
+    by_month = (
+        df.groupby(df["date"].dt.strftime("%Y-%m"))
+        .agg(units=("units", "sum"), revenue=("revenue", "sum"))
+        .round(2)
+        .reset_index()
+        .rename(columns={"date": "month"})
+    )
+    best_region = by_region.iloc[0]["region"]
 
-    region_rows = "\n".join(
-        f"<tr>"
-        f"<td style='padding:6px 12px;border-bottom:1px solid #eee;'>{r['region']}</td>"
-        f"<td style='padding:6px 12px;border-bottom:1px solid #eee;text-align:right;'>{int(r['units']):,}</td>"
-        f"<td style='padding:6px 12px;border-bottom:1px solid #eee;text-align:right;'>${r['revenue']:,.2f}</td>"
-        f"</tr>"
-        for _, r in by_region.iterrows()
+    env = Environment(loader=FileSystemLoader(TEMPLATES_DIR), autoescape=True)
+    template = env.get_template("email.html")
+
+    return template.render(
+        title="Sales Report",
+        generated_at=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+        total_revenue=total_revenue,
+        total_units=total_units,
+        best_region=best_region,
+        regions=by_region.to_dict("records"),
+        months=by_month.to_dict("records"),
     )
 
-    html = f"""
-    <html>
-      <body style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#222;">
-        <h2 style="color:#4472C4;margin-bottom:4px;">Sales Report</h2>
-        <p style="color:#666;margin-top:0;">
-          Generated {datetime.now().strftime('%Y-%m-%d %H:%M')}
-        </p>
 
-        <table style="border-collapse:collapse;background:#f2f2f2;padding:12px;border-radius:6px;">
-          <tr>
-            <td style="padding:6px 18px 6px 6px;color:#555;">Total revenue</td>
-            <td style="padding:6px 6px;font-weight:600;">${total_revenue:,.2f}</td>
-          </tr>
-          <tr>
-            <td style="padding:6px 18px 6px 6px;color:#555;">Total units</td>
-            <td style="padding:6px 6px;font-weight:600;">{total_units:,}</td>
-          </tr>
-          <tr>
-            <td style="padding:6px 18px 6px 6px;color:#555;">Best region</td>
-            <td style="padding:6px 6px;font-weight:600;">{best_region_row}</td>
-          </tr>
-        </table>
-
-        <h3 style="color:#4472C4;margin-top:24px;">Revenue by Region</h3>
-        <table style="border-collapse:collapse;font-size:14px;">
-          <thead>
-            <tr style="background:#4472C4;color:white;">
-              <th style="padding:8px 12px;text-align:left;">Region</th>
-              <th style="padding:8px 12px;text-align:right;">Units</th>
-              <th style="padding:8px 12px;text-align:right;">Revenue</th>
-            </tr>
-          </thead>
-          <tbody>
-            {region_rows}
-          </tbody>
-        </table>
-
-        <p style="margin-top:24px;color:#666;font-size:13px;">
-          Full report with charts is attached as a PDF.
-        </p>
-      </body>
-    </html>
-    """
-    return html
-
-
-def build_plain_text(df):
-    """Simple plaintext fallback for email clients that don't render HTML."""
+def build_plain_text(df) -> str:
     df["revenue"] = (df["units"] * df["unit_price"]).round(2)
-    total_revenue = df["revenue"].sum()
-    total_units = df["units"].sum()
+    total_revenue = float(df["revenue"].sum())
+    total_units = int(df["units"].sum())
     return (
-        f"Sales Report — {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
+        f"Sales Report — {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}\n\n"
         f"Total revenue: ${total_revenue:,.2f}\n"
         f"Total units: {total_units:,}\n\n"
         f"Full report attached as PDF.\n"
     )
 
 
-def main():
-    # Read data for the summary
+def send_report_email(pdf_path: Path = None) -> None:
+    """Send the report email. Uses given PDF path or default. Reusable."""
+    pdf_path = pdf_path or PDF_PATH
+    if not pdf_path.exists():
+        raise FileNotFoundError(f"PDF not found: {pdf_path}. Run pdf_report.py first.")
+
+    gmail_user, gmail_password, email_to = _get_secrets()
+
     df = pd.read_csv(INPUT)
+    df["date"] = pd.to_datetime(df["date"])
 
-    # Build the message
     msg = EmailMessage()
-    msg["From"] = GMAIL_USER
-    msg["To"] = EMAIL_TO
-    msg["Subject"] = f"Sales Report — {datetime.now().strftime('%Y-%m-%d')}"
-
-    # Plain text first, then HTML alternative
+    msg["From"] = gmail_user
+    msg["To"] = email_to
+    msg["Subject"] = f"Sales Report — {datetime.now(timezone.utc).strftime('%Y-%m-%d')}"
     msg.set_content(build_plain_text(df))
     msg.add_alternative(build_summary_html(df), subtype="html")
 
-    # Attach the PDF
-    if not PDF_PATH.exists():
-        raise FileNotFoundError(f"PDF not found: {PDF_PATH}. Run pdf_report.py first.")
-    pdf_bytes = PDF_PATH.read_bytes()
+    pdf_bytes = pdf_path.read_bytes()
     msg.add_attachment(
-        pdf_bytes,
-        maintype="application",
-        subtype="pdf",
-        filename=PDF_PATH.name,
+        pdf_bytes, maintype="application", subtype="pdf", filename=pdf_path.name,
     )
 
-    # Send
     context = ssl.create_default_context()
     with smtplib.SMTP("smtp.gmail.com", 587, timeout=30) as smtp:
         smtp.starttls(context=context)
-        smtp.login(GMAIL_USER, GMAIL_APP_PASSWORD)
+        smtp.login(gmail_user, gmail_password)
         smtp.send_message(msg)
 
-    print(f"Email sent to {EMAIL_TO}")
-    print(f"Attachment: {PDF_PATH.name} ({len(pdf_bytes) / 1024:.1f} KB)")
+    print(f"Email sent to {email_to}")
+    print(f"Attachment: {pdf_path.name} ({len(pdf_bytes) / 1024:.1f} KB)")
+
+
+def main():
+    send_report_email()
 
 
 if __name__ == "__main__":
     main()
-
