@@ -18,7 +18,7 @@ def main():
     soup = BeautifulSoup(response.content, "lxml")
 
     # Page title
-    print(f"\nPage title: {soup.title.string.strip}")
+    print(f"\nPage title: {soup.title.string.strip()}")
 
     # Count books on the page
     books = soup.find_all("article", class_="product_pod")
