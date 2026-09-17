@@ -13,6 +13,10 @@ Everything is version-controlled, cloud-scheduled, and self-documenting.
 | [Week 3](week3/) | Web automation | requests + BeautifulSoup basics |
 | [Week 4](week4/) | APIs & integrations | OAuth2, Google Sheets, webhooks, Telegram bots |
 | [Week 5](week5/) | No-code + CI/CD | n8n workflows, webhook integration, matrix builds |
+| [Week 6](week6/) | AI automation | Local LLMs, function calling, RAG, AI agents |
+
+
+
 
 ## The system in motion
 
@@ -38,6 +42,11 @@ Everything is version-controlled, cloud-scheduled, and self-documenting.
 - **Telegram Bot API** — real-time notifications & control
 - **Google Sheets API** — OAuth2-based data integration
 - **Docker** — reproducible environments
+- **Ollama + Gemma 3 4B** — local LLMs, no API keys
+- **RAG** — semantic search over the repo using embeddings
+- **Function calling** — AI agents that take actions
+
+
 
 ## Quick start
 

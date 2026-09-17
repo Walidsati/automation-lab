@@ -19,3 +19,10 @@ secrets/
 # Google OAuth credentials
 client_secret.json
 token.json
+week6/drafts/
+week6/tasks/
+week6/spam/
+week6/processed/
+
+# RAG index (regenerate with: python week6/rag_index.py)
+week6/rag_index.json
