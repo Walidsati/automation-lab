@@ -214,8 +214,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -16,
-        -240
+        -176,
+        -464
       ],
       "id": "0d01ebb4-440c-4734-9279-7a04e840bd59",
       "name": "Webhook",
@@ -248,6 +248,12 @@
               "name": "commits",
               "value": "={{ $json.body.commits.length }}",
               "type": "string"
+            },
+            {
+              "id": "471b882f-89c5-422a-b738-852673eb6a50",
+              "name": "commit_message",
+              "value": "={{ $json.body.commits[0].message }}",
+              "type": "string"
             }
           ]
         },
@@ -256,8 +262,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.5,
       "position": [
-        512,
-        -240
+        16,
+        -464
       ],
       "id": "05d6d358-a347-45e9-85b1-27efc17a6227",
       "name": "Edit Fields1"
@@ -265,14 +271,14 @@
     {
       "parameters": {
         "chatId": "1156554611",
-        "text": "=🔔 {{ $json.event_type }} on {{ $json.repo }} By: {{ $json.pusher }} — {{ $json.commits }} commit(s)",
+        "text": "=📊 Daily report ran successfully\n\nRepository: {{ $json.repo }}\nTriggered by: {{ $json.pusher }}\nCommit: {{ $json.commit_message }}\n\nView run: https://github.com/{{ $json.repo }}/actions",
         "additionalFields": {}
       },
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        736,
-        -240
+        448,
+        -592
       ],
       "id": "b214b4f8-2d6c-4de8-8ba8-f12af83c608f",
       "name": "Send a text message3",
@@ -283,6 +289,50 @@
           "name": "Telegram account"
         }
       }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "000cedd6-2601-4fe5-a543-695348677655",
+              "leftValue": "={{ $json.commit_message }}",
+              "rightValue": "chore: daily report",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        -464
+      ],
+      "id": "1714b0d2-0a45-40f2-94f6-2c4a97989610",
+      "name": "If1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -336
+      ],
+      "id": "d7cad49b-0a05-4ff9-b25b-31286135f0bc",
+      "name": "No Operation, do nothing"
     }
   ],
   "pinData": {},
@@ -369,7 +419,25 @@
       "main": [
         [
           {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
             "node": "Send a text message3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
             "type": "main",
             "index": 0
           }
@@ -390,7 +458,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "802eb6f8-6f71-4035-852c-6b2c55943c2c",
+  "versionId": "750e6390-8149-43ca-9c99-9216bbe0828d",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "a17c367886c80f30f0fe35962fd475e44a3c6a021efbb1e68f65ccf000d0d514"
