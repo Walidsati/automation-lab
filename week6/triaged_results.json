@@ -1,0 +1,47 @@
+[
+  {
+    "sender": "client@bigcorp.com",
+    "subject": "Re: Proposal \u2014 questions",
+    "triage": {
+      "category": "customer_support",
+      "priority": "urgent",
+      "needs_reply": true,
+      "summary": "The client has questions regarding the proposal, specifically delivery dates, payment, and support options.",
+      "action_items": [
+        "Confirm Q2 delivery feasibility",
+        "Provide detailed payment schedule options",
+        "Outline support package details"
+      ],
+      "draft_reply": "Thank you for reviewing the proposal. I'd be happy to address your questions regarding Q2 delivery, payment schedules, and support packages. Could we schedule a brief call to discuss these details?"
+    }
+  },
+  {
+    "sender": "noreply@github.com",
+    "subject": "[automation-lab] Run failed: Daily Sales Report",
+    "triage": {
+      "category": "system_notification",
+      "priority": "normal",
+      "needs_reply": false,
+      "summary": "The automated GitHub workflow for the Daily Sales Report failed, requiring investigation.",
+      "action_items": [
+        "Check the GitHub logs for failure details"
+      ],
+      "draft_reply": null
+    }
+  },
+  {
+    "sender": "friend@gmail.com",
+    "subject": "Dinner Saturday?",
+    "triage": {
+      "category": "personal",
+      "priority": "normal",
+      "needs_reply": true,
+      "summary": "A friend is asking to get together for dinner this Saturday evening.",
+      "action_items": [
+        "Check availability for Saturday",
+        "Confirm dinner plans"
+      ],
+      "draft_reply": "Hey! Saturday sounds fun. Let me check my calendar and get back to you shortly about availability."
+    }
+  }
+]

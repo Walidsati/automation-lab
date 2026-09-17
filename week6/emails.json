@@ -1,0 +1,17 @@
+[
+  {
+    "sender": "client@bigcorp.com",
+    "subject": "Re: Proposal — questions",
+    "body": "Thanks for sending the proposal. I have a few questions: 1) Can you deliver by Q2? 2) What's the payment schedule? 3) Do you offer support? Looking forward to hearing back."
+  },
+  {
+    "sender": "noreply@github.com",
+    "subject": "[automation-lab] Run failed: Daily Sales Report",
+    "body": "The workflow Daily Sales Report run #35214789144 failed. Check the logs."
+  },
+  {
+    "sender": "friend@gmail.com",
+    "subject": "Dinner Saturday?",
+    "body": "Hey! Free for dinner Saturday around 8pm? Let me know."
+  }
+]
