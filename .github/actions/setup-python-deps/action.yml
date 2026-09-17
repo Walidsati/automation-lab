@@ -1,0 +1,24 @@
+name: Setup Python + dependencies
+description: Install Python 3.12 and project dependencies from requirements.txt
+
+inputs:
+  python-version:
+    description: Python version to install
+    required: false
+    default: "3.12"
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python ${{ inputs.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: pip
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
