@@ -1,0 +1,401 @@
+{
+  "name": "Automation Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "19a1ca3e-2357-49ae-91cd-c9d2b04648a8",
+              "name": "greeting",
+              "value": "Hello from n8n!",
+              "type": "string"
+            },
+            {
+              "id": "fa38d62a-be2e-47a6-8378-1418dab183fa",
+              "name": "timestamp",
+              "value": "={{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        80,
+        -80
+      ],
+      "id": "f878e41b-2987-442c-8737-33580f62ed67",
+      "name": "Firs Workflow"
+    },
+    {
+      "parameters": {
+        "url": "https://api.github.com/users/Walidsati",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "n8n-automation-lab"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        288,
+        -80
+      ],
+      "id": "5b22c07b-5a10-4622-85c9-46126513c151",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b8f8fd45-06a9-473b-922d-0f9e3ccaf2d0",
+              "name": "github_user",
+              "value": "={{ $json.login }}",
+              "type": "string"
+            },
+            {
+              "id": "e55f291e-c706-4071-b720-ca955ad9f0c9",
+              "name": "public_repos",
+              "value": "={{ $json.public_repos }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        512,
+        -80
+      ],
+      "id": "ce4d7dcc-3081-427f-8a11-9cc0cd3ecffc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "chatId": "1156554611",
+        "text": "=GitHub user: {{ $json.github_user }} — Public repos: {{ $json.public_repos }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        -96
+      ],
+      "id": "0c899757-d31f-49dc-a48d-805b2e8a8970",
+      "name": "Send a text message",
+      "webhookId": "b61c1410-3b1d-4cf5-aac1-595b46474380",
+      "credentials": {
+        "telegramApi": {
+          "id": "IqKGlsUu9ZJobmMD",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 3
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -160,
+        -80
+      ],
+      "id": "18884c9e-c162-48bd-993f-ec42bcb2c0ef",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "39f1d06f-d4c5-4c7f-87d9-3562d7eed652",
+              "leftValue": "={{ Number($json.public_repos) }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        736,
+        -80
+      ],
+      "id": "20aacf80-035d-450f-9be5-54ae950bfcad",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "=1156554611",
+        "text": "=Low repo count: {{ $('Edit Fields').item.json.public_repos }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        64
+      ],
+      "id": "b4dbd8f2-d894-4ce8-bde1-a3368874661e",
+      "name": "Send a text message1",
+      "webhookId": "78eccf29-160b-4f03-8d09-56d5fec21759",
+      "credentials": {
+        "telegramApi": {
+          "id": "IqKGlsUu9ZJobmMD",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "1156554611",
+        "text": "=High repo count: {{ $('Edit Fields').item.json.public_repos }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        -256
+      ],
+      "id": "d12f4607-6d94-405f-a8c8-561b8ae6ce4a",
+      "name": "Send a text message2",
+      "webhookId": "0a3f9c6e-b466-4143-9da6-26c9f7161135",
+      "credentials": {
+        "telegramApi": {
+          "id": "IqKGlsUu9ZJobmMD",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "github-push",
+        "options": {
+          "responseCode": {
+            "values": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        -240
+      ],
+      "id": "0d01ebb4-440c-4734-9279-7a04e840bd59",
+      "name": "Webhook",
+      "webhookId": "a8f9dba7-f3a8-476f-b209-35314052c48d"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ec558e23-4061-4a19-a20e-d44ea38bd15a",
+              "name": "event_type",
+              "value": "={{ $json.headers['x-github-event'] }}",
+              "type": "string"
+            },
+            {
+              "id": "3c42e8df-0dbd-42f1-bc6b-a6fa1c1e1f52",
+              "name": "repo",
+              "value": "={{ $json.body.repository.full_name }}",
+              "type": "string"
+            },
+            {
+              "id": "e81ada84-ddae-409c-8277-03f04e07b472",
+              "name": "pusher",
+              "value": "={{ $json.body.pusher.name }}",
+              "type": "string"
+            },
+            {
+              "id": "f6775f20-2946-40d1-b3c6-2eacb9c049ff",
+              "name": "commits",
+              "value": "={{ $json.body.commits.length }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        512,
+        -240
+      ],
+      "id": "05d6d358-a347-45e9-85b1-27efc17a6227",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "chatId": "1156554611",
+        "text": "=🔔 {{ $json.event_type }} on {{ $json.repo }} By: {{ $json.pusher }} — {{ $json.commits }} commit(s)",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        736,
+        -240
+      ],
+      "id": "b214b4f8-2d6c-4de8-8ba8-f12af83c608f",
+      "name": "Send a text message3",
+      "webhookId": "3736f7f3-c60d-495b-84c0-8a0d8f9673fd",
+      "credentials": {
+        "telegramApi": {
+          "id": "IqKGlsUu9ZJobmMD",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Firs Workflow": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Firs Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "Asia/Beirut",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "802eb6f8-6f71-4035-852c-6b2c55943c2c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a17c367886c80f30f0fe35962fd475e44a3c6a021efbb1e68f65ccf000d0d514"
+  },
+  "nodeGroups": [],
+  "id": "auxWh1SfgD2v6Ppv",
+  "tags": []
+}
