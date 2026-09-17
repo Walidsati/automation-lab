@@ -15,3 +15,7 @@ secrets/
 !week1/hello_time_cloud.log
 # Automation output we track from week 2
 !week2/data/run_report.log
+
+# Google OAuth credentials
+client_secret.json
+token.json
