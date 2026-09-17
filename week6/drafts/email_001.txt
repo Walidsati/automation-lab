@@ -1,0 +1,4 @@
+To: customer@example.com
+Generated: 2026-09-17 16:27 UTC
+
+Hello Maria, I am sorry to hear that your widget arrived broken. Please accept our apologies for the inconvenience. Could you please provide a photo of the damaged item? Once we receive the photo, we will immediately process your full refund for order #12345. Thank you for your understanding.

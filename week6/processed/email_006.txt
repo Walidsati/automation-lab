@@ -1,0 +1,6 @@
+From: noreply@github.com
+Subject: [automation-lab] Run failed: Daily Sales Report
+Date: 2026-09-17 06:05
+
+The workflow Daily Sales Report run #35214789144 failed. Check the logs at:
+https://github.com/Walidsati/automation-lab/actions/runs/35214789144

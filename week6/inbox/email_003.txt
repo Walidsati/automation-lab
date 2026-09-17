@@ -1,0 +1,7 @@
+From: boss@mycompany.com
+Subject: URGENT: contract review needed by EOD
+Date: 2026-09-17 09:30
+
+Hi, I need you to review the attached contract for the Acme deal and send feedback before 5 PM today. This is time-sensitive.
+
+Thanks.
