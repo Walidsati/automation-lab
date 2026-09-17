@@ -26,3 +26,4 @@ Every project runs in two places: locally on macOS (via launchd) and in the clou
 Logs:
 - week1/hello_time_local.log — written by macOS launchd
 - week1/hello_time_cloud.log — written by GitHub Actions
+
