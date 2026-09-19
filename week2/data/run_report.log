@@ -77,3 +77,12 @@
 2026-09-18 10:33:29 UTC [INFO] Step 3/3: sending email
 2026-09-18 10:33:31 UTC [INFO]   Email sent (2.19s)
 2026-09-18 10:33:31 UTC [INFO] Pipeline finished successfully
+2026-09-19 10:17:45 UTC [INFO] ============================================================
+2026-09-19 10:17:45 UTC [INFO] Week 2 pipeline started
+2026-09-19 10:17:46 UTC [INFO] Step 1/3: generating Excel report
+2026-09-19 10:17:47 UTC [INFO]   Excel saved: /home/runner/work/automation-lab/automation-lab/week2/data/sales_report_xw.xlsx (0.17s)
+2026-09-19 10:17:47 UTC [INFO] Step 2/3: generating PDF report
+2026-09-19 10:17:47 UTC [INFO]   PDF saved: /home/runner/work/automation-lab/automation-lab/week2/data/sales_report.pdf (0.12s)
+2026-09-19 10:17:47 UTC [INFO] Step 3/3: sending email
+2026-09-19 10:17:50 UTC [INFO]   Email sent (2.94s)
+2026-09-19 10:17:50 UTC [INFO] Pipeline finished successfully
